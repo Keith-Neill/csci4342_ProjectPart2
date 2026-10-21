@@ -1,0 +1,6 @@
+program counter ;
+var count1 , 2count : integer ;
+begin
+count1 := 0 ;
+write ( count1 )
+end .

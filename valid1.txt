@@ -1,0 +1,13 @@
+program sumsquares ;
+var n , i , total : integer ;
+begin
+read ( n ) ;
+total := 0 ;
+i := 1 ;
+while i <= n do
+begin
+total := total + i * i ;
+i := i + 1
+end ;
+write ( total )
+end .

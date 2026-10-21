@@ -1,0 +1,16 @@
+program flags ;
+var a , b : integer ;
+done , ok : boolean ;
+procedure check ;
+begin
+ok := ( a < b ) and not done ;
+if ok then write ( a ) else write ( b )
+end ;
+begin
+read ( a ) ;
+read ( b ) ;
+done := false ;
+check ;
+done := true or false ;
+if not done then write ( 0 )
+end .

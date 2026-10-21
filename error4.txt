@@ -1,0 +1,7 @@
+program area ;
+var w , h : integer ;
+begin
+read ( w ) ;
+read ( h ) ;
+write ( ( w * h ) div 2 ;
+end .

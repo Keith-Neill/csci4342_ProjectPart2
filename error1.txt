@@ -1,0 +1,8 @@
+program tally ;
+var n , total : integer ;
+begin
+read ( n ) ;
+total := 0
+total := total + n ;
+write ( total )
+end .

@@ -1,0 +1,28 @@
+program layers ;
+var x , y , z : integer ;
+procedure inner ;
+var t : integer ;
+begin
+t := x div 2 ;
+z := z + t ;
+end ;
+procedure outer ;
+begin
+inner ;
+if z > 10 then
+if z > 100 then write ( 100 ) else write ( 10 )
+else
+write ( 0 )
+end ;
+begin
+read ( x ) ;
+read ( y ) ;
+z := y ;
+while x > 0 do
+begin
+outer ;
+x := x - 1 ;
+end ;
+;
+write ( z )
+end .

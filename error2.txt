@@ -1,0 +1,7 @@
+program grade ;
+var score : integer ;
+begin
+read ( score ) ;
+if score >= 90
+write ( 1 )
+end .

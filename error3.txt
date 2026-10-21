@@ -1,0 +1,9 @@
+program sign ;
+var x : integer ;
+begin
+read ( x ) ;
+if x < 0 then
+write ( 0 ) ;
+else
+write ( 1 )
+end .
