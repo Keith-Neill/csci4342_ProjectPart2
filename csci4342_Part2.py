@@ -17,6 +17,30 @@ def identifier(i):
     else:
         print("Error: expected an identifier token, got", lexeme_tokens[i], "instead. '",lexemes[i],"' is not a valid identifier.")
         sys.exit(1)
+# <procedure declaration>
+def procedure_declaration(i):
+    i = i+1 # consume procedure
+    return i
+
+# <procedure declaration part>
+def procedure_declaration_part(i):
+    if lexemes[i] == "procedure":
+        more_procedure_declarations = True
+    else:
+        more_procedure_declarations = False
+
+    while more_procedure_declarations:
+        i = procedure_declaration(i)
+        #if lexemes[i] == ";":
+         #   i = i+1
+          #  print(i)
+        #else:
+         #   print("Error: Expected a ';', got", lexemes[i], "instead")
+          #  sys.exit(1)
+        if lexemes[i] != "procedure":
+            more_procedure_declarations = False
+    return i
+        
 
 # <simple type>
 def simple_type(i):
@@ -72,19 +96,50 @@ def variable_declaration(i):
 
 # <variable declaration part>
 def variable_declarition_part(i):
-    i = i+1 # consume var
+    if lexemes[i] == "var":
+        i = i+1 # consume var
+    else:
+        # if the current lexeme isn't i, go back to block() function. <variable declaration part> -> empty string
+        return i
+    
     i = variable_declaration(i)
     print(i)
+
+    if lexemes[i] == ";":
+        i = i+1
+        print(i)
+    else:
+        print("Error: Expected a ';', got", lexeme[i], "instead")
+        sys.exit(1)
+
+    if lexeme_tokens[i] == "Identifier Token":
+        more_variable_declaritions = True
+    else:
+        more_variable_declaritions = False
+    while more_variable_declaritions:
+        print("in while loop")
+        i = variable_declaration(i)
+        print(i)
+        if lexemes[i] == ";":
+            i = i+1
+            print(i)
+        else:
+            print("Error: Expected a ';', got", lexeme[i], "instead")
+            sys.exit(1)
+        if lexeme_tokens[i] != "Identifier Token":
+            more_variable_declaritions = False
+            print("get out of while loop")
+        
+
     return i
     
 
 # <block>
 def block(i):
-    if lexemes[i] == "var":
-        i = variable_declarition_part(i)
-        
     
-    print("end of block: i = ", i)
+    i = variable_declarition_part(i)
+    i = procedure_declaration_part(i)
+    print("End of block. i = ", i)
 
 # <program>
 def program(i):
