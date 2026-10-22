@@ -18,6 +18,74 @@ def identifier(i):
         print("Error: expected an identifier token, got", lexeme_tokens[i], "instead. '",lexemes[i],"' is not a valid identifier.")
         sys.exit(1)
 
+# <simple type>
+def simple_type(i):
+    if lexeme_tokens[i] == "Data Type Token":
+        i = i+1
+    else:
+        print("Error: Expected a Data Type Token, got a ", lexeme_tokens[i], " instead. Lexeme ", lexemes[i], " is not a Data Type Token.")
+        sys.exit(1)
+    return i
+
+# <type>
+def type(i):
+    i = simple_type(i)
+    return i
+
+#<variable declaration>
+def variable_declaration(i):
+    #if lexeme_tokens[i] == "Identifier Token":    
+    i = identifier(i)
+    print(i)
+
+    if lexemes[i] == "," and lexeme_tokens[i+1] == "Identifier Token":
+        print("loop in while")
+        more_identifiers = True
+    else:
+        more_identifiers = False
+    
+    while more_identifiers:
+        if lexemes[i] != ",":
+            print("Error: A ',' is expected, got lexeme ", lexemes[i], "instead.")
+            sys.exit(1)
+        
+        i = i+1 # consume ","
+        print(i)
+        i = identifier(i)
+        print(i)
+
+        if lexemes[i] != "," and lexeme_tokens[i+1] != "Identifier Token":
+            more_identifiers = False
+            print("get out of while")
+    
+    if lexemes[i] == ":":
+        i = i+1 # consume the ":" lexeme
+        print(i)
+    else:
+        print("Error: Expect a ':', got",lexemes[i], "instead.")
+        sys.exit(1)
+
+    i = type(i)
+    print(i)
+    
+    return i
+
+# <variable declaration part>
+def variable_declarition_part(i):
+    i = i+1 # consume var
+    i = variable_declaration(i)
+    print(i)
+    return i
+    
+
+# <block>
+def block(i):
+    if lexemes[i] == "var":
+        i = variable_declarition_part(i)
+        
+    
+    print("end of block: i = ", i)
+
 # <program>
 def program(i):
     if lexemes[i] == "program":
@@ -31,6 +99,8 @@ def program(i):
             print("Error: ';' is expected. Fornd'", lexemes[i], "'instead.")
             sys.exit(1)
         print(i)
+        
+        block(i)
     else:
         print("Error: expected 'program', found'" ,lexemes[i], "'instead")
         sys.exit(1)
@@ -72,7 +142,7 @@ for lexeme in lexemes:
         lexeme_tokens.append("Reserved Token")
     elif lexeme in data_type_tokens_list:
         print(lexeme, ": Data Type Token")
-        lexeme_tokens.append("Date Type Token")
+        lexeme_tokens.append("Data Type Token")
     elif lexeme in boolean_tokens_list:
         print(lexeme, ": Boolean Token")
         lexeme_tokens.append("Boolean Token")
