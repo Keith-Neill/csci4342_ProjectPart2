@@ -17,9 +17,95 @@ def identifier(i):
     else:
         print("Error: expected an identifier token, got", lexeme_tokens[i], "instead. '",lexemes[i],"' is not a valid identifier.")
         sys.exit(1)
+
+# <factor>
+def factor(i):
+    pass
+
+# <term>
+def term(i):
+    i = factor(i)
+    return i
+
+# <simple expression>
+def simple_expression(i):
+    i = term(i)
+    return i
+
+
+# <expression>
+def expression(i):
+    i = simple_expression(i)
+    return i
+
+# <assignment statement>
+def assignment_statement(i):
+    print("assignment statement")
+    i = identifier(i)
+    if lexeme_tokens[i] == "Assignment Token":
+        i = i+1
+    else:
+        print("Error: Expected Assignment Token, got", lexeme_tokens[i], "instead.")
+        sys.exit(1)
+
+    i = ezpression(i)
+    
+    return i
+
+# <simple statement>
+def simple_statement(i):
+    print("simple statement")
+    if lexeme_tokens[i] == "Identifier Token" and lexeme_tokens[i+1] == "Assignment Token":
+       i = assignment_statement(i)
+       
+    return i
+
+# <statement>
+def statement(i):
+    print("statement")
+    if lexeme_tokens[i] == "Identifier Token" or lexemes[i] == "read" or lexemes[i] == "write":
+        i = simple_statement(i)
+        
+    return i
+
+# <compound statement>
+def compound_statement(i):
+    if lexemes[i] == "begin":
+        i = i+1
+        print(i)
+    else:
+        print("Error: Expected lexene 'begin', got", lexemes[i], "instead")
+        sys.exit(1)
+
+    i = statement(i)
+
+    return i
+
+# <statement part>
+def statement_part(i):
+    i = compound_statement(i)
+    return i
+
+#  <procedure block>
+def procedure_block(i):
+    i = variable_declarition_part(i)
+    i = statement_part(i)
+
+    return i
+
 # <procedure declaration>
 def procedure_declaration(i):
     i = i+1 # consume procedure
+    i = identifier(i)
+    if lexemes[i] == ";":
+        i = i+1
+        print(i)
+    else:
+        print("Error: Expected a ';', got", lexemes[i], "instead")
+        sys.exit(1)
+
+    i = procedure_block(i)
+
     return i
 
 # <procedure declaration part>
@@ -31,12 +117,12 @@ def procedure_declaration_part(i):
 
     while more_procedure_declarations:
         i = procedure_declaration(i)
-        #if lexemes[i] == ";":
-         #   i = i+1
-          #  print(i)
-        #else:
-         #   print("Error: Expected a ';', got", lexemes[i], "instead")
-          #  sys.exit(1)
+        if lexemes[i] == ";":
+            i = i+1
+            print(i)
+        else:
+            print("Error: Expected a ';', got", lexemes[i], "instead")
+            sys.exit(1)
         if lexemes[i] != "procedure":
             more_procedure_declarations = False
     return i
@@ -58,7 +144,7 @@ def type(i):
 
 #<variable declaration>
 def variable_declaration(i):
-    #if lexeme_tokens[i] == "Identifier Token":    
+       
     i = identifier(i)
     print(i)
 
