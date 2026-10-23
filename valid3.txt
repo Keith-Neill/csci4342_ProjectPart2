@@ -25,4 +25,4 @@ x := x - 1 ;
 end ;
 ;
 write ( z )
-end .
+end . ter

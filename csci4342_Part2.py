@@ -20,24 +20,34 @@ def identifier(i):
 
 # <factor>
 def factor(i):
+
+    if lexemes[i] == "(":
+        i = i+1 # consume (
+        print("consume (")
+        i = expression(i)
+        if lexemes[i] == ")":
+            print(")")
+            i = i+1 # consume )
+            return i
+        else:
+            print("Error: Expected ')' after expression.")
+            sys.exit(1)
+
     print("inside factor")
     print("lexeme ", lexemes[i+1])
     if lexeme_tokens[i] == "Integer Token" or lexeme_tokens[i] == "Boolean Token":
         print("in int or bool")
         i = i+1 # <constant>
-    elif lexemes[i] == "(":
-        i = i+1 # consume (
-        print("consume (")
-        i = expression(i)
-    elif lexemes[i] == ")":
-        print(")")
-        i = i+1 # consume )
+    
     elif lexemes[i] == "not":
         print("not")
         i = i+1 # consume "not"
         factor(i)
-    else:
+    elif lexeme_tokens[i] == "Identifier Token":
         i = identifier(i)
+    else:
+        print("Error: ", lexemes[i], "cannot be a factor")
+        sys.exit(1)
 
     return i
 
@@ -126,9 +136,9 @@ def simple_statement(i):
        i = assignment_statement(i)
     elif lexeme_tokens[i] == "Identifier Token":
         i = identifier(i) # <procedure statement>
-    elif lexemes[i] == "(" and lexemes[i+1] == "read":
+    elif lexemes[i] == "read":
         i = read_statement(i)
-    elif lexemes[i] == "(" and lexemes[i+1] == "write":
+    elif lexemes[i] == "write":
             i = write_statement(i)
     else:
         print("Error: ",lexemes[i],"is not recognised as a statement.")
@@ -183,6 +193,10 @@ def statement(i):
         i = simple_statement(i)
     elif lexemes[i] == "begin" or lexemes[i] == "if" or lexemes[i] == "while":
         i = structured_statement(i)
+    elif lexemes[i] == "end":
+            return i # <empty statement> next lexeme is end
+    else:
+        print("Error: ", lexemes[i], "is not the start of a valid statement.")
 
     
     return i
@@ -198,7 +212,18 @@ def compound_statement(i):
 
     i = statement(i)
     if lexemes[i] == ";":
-        #TODO finish 
+       more_statements = True
+    else:
+        more_statements = False
+
+    while more_statements:
+        i = i+1 # consume ;
+        i = statement(i)
+        if lexemes[i] == "end":
+            more_statements = False
+
+    i = i + 1 # consume end
+    
 
     return i
 
@@ -346,7 +371,9 @@ def block(i):
     
     i = variable_declarition_part(i)
     i = procedure_declaration_part(i)
+    i = statement_part(i)
     print("End of block. i = ", i)
+    print(lexemes[i])
 
 # <program>
 def program(i):
@@ -363,6 +390,7 @@ def program(i):
         print(i)
         
         block(i)
+        
     else:
         print("Error: expected 'program', found'" ,lexemes[i], "'instead")
         sys.exit(1)
