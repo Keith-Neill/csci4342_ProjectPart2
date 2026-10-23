@@ -20,22 +20,66 @@ def identifier(i):
 
 # <factor>
 def factor(i):
-    pass
+    print("inside factor")
+    print("lexeme ", lexemes[i+1])
+    if lexeme_tokens[i] == "Integer Token" or lexeme_tokens[i] == "Boolean Token":
+        print("in int or bool")
+        i = i+1 # <constant>
+    elif lexemes[i] == "(":
+        i = i+1 # consume (
+        print("consume (")
+        i = expression(i)
+    elif lexemes[i] == ")":
+        print(")")
+        i = i+1 # consume )
+    elif lexemes[i] == "not":
+        print("not")
+        i = i+1 # consume "not"
+        factor(i)
+    else:
+        i = identifier(i)
+
+    return i
 
 # <term>
 def term(i):
     i = factor(i)
+    if lexeme_tokens[i] == "Multiplication Token":
+        multiply_more_factors = True
+    else:
+        multiply_more_factors = False
+    
+    while multiply_more_factors:
+        i = i+1 # consume multiplication lexeme
+        i = factor(i)
+        if lexeme_tokens[i] != "Multiplication Token":
+            multiply_more_factors = False
+    
     return i
 
 # <simple expression>
 def simple_expression(i):
     i = term(i)
+    if lexeme_tokens[i] == "Addition Token":
+        add_more_terms = True
+    else:
+        add_more_terms = False
+        
+    while add_more_terms:
+        i = i+1 # consume addition lexeme
+        i = term(i)
+        if lexeme_tokens[i] != "Addition Token":
+            add_more_terms = False
+        
     return i
 
 
 # <expression>
 def expression(i):
     i = simple_expression(i)
+    if lexeme_tokens[i] == "Relation Token":
+        i = i+1 # consume lexeme with relation token
+        i = simple_expression(i)
     return i
 
 # <assignment statement>
@@ -48,16 +92,88 @@ def assignment_statement(i):
         print("Error: Expected Assignment Token, got", lexeme_tokens[i], "instead.")
         sys.exit(1)
 
-    i = ezpression(i)
+    i = expression(i)
     
+    return i
+
+
+# <read statement>
+def read_statement(i):
+    i = i+1 # consume "read"
+    i = i+1 # consume (
+    i = identifier(i)
+    if lexemes[i] == ")":
+        i = i+1 # consume )
+    else:
+        print("Error: ')' is expected after read statement")
+    return i
+
+# <write statement>
+def write_statement(i):
+    i = i+1 # consume "write"
+    i = i+1 # consume (
+    i = expression(i) # <output value>
+    if lexemes[i] == ")":
+        i = i+1 # consume )
+    else:
+        print("Error: ')' is expected after write statement")
     return i
 
 # <simple statement>
 def simple_statement(i):
-    print("simple statement")
+    
     if lexeme_tokens[i] == "Identifier Token" and lexeme_tokens[i+1] == "Assignment Token":
        i = assignment_statement(i)
+    elif lexeme_tokens[i] == "Identifier Token":
+        i = identifier(i) # <procedure statement>
+    elif lexemes[i] == "(" and lexemes[i+1] == "read":
+        i = read_statement(i)
+    elif lexemes[i] == "(" and lexemes[i+1] == "write":
+            i = write_statement(i)
+    else:
+        print("Error: ",lexemes[i],"is not recognised as a statement.")
+        sys.exit(1)
        
+    return i
+
+
+# <if statement>
+def if_statement(i):
+    i = i+1 # consume "if"
+    i = expression(i)
+    if lexemes[i] == "then":
+        i = i+1 # consume then
+    else:
+        print("Error: Expected 'then' after if statenent.")
+        sys.exit(1)
+    i = statement(i)
+    if lexemes[i] == "else":
+        i = i+1 # consume else
+        i = statement(i)
+    return i
+
+# <while statement>
+def while_statement(i):
+    i = i+1 # consume while
+    i = expression(i)
+    if lexemes[i] == "do":
+        i = i+1 # consume do
+    else:
+        print("Error: Expected 'do' after exopression in while statement.")
+        sys.exit(1)
+    i = statement(i)
+    return i
+
+# <structured statenebt>
+def structured_statement(i):
+    if lexemes[i] == "begin":
+        i = compound_statement(i)
+    elif lexemes[i] == "if":
+        i = if_statement(i)
+    elif lexemes[i] == "while":
+        i = while_statement(i)
+    else:
+        print("Error: ",lexemes[i], " is not recognised as a structured statement.")
     return i
 
 # <statement>
@@ -65,7 +181,10 @@ def statement(i):
     print("statement")
     if lexeme_tokens[i] == "Identifier Token" or lexemes[i] == "read" or lexemes[i] == "write":
         i = simple_statement(i)
-        
+    elif lexemes[i] == "begin" or lexemes[i] == "if" or lexemes[i] == "while":
+        i = structured_statement(i)
+
+    
     return i
 
 # <compound statement>
@@ -77,6 +196,8 @@ def compound_statement(i):
         print("Error: Expected lexene 'begin', got", lexemes[i], "instead")
         sys.exit(1)
 
+    i = statement(i)
+    i = i+1
     i = statement(i)
 
     return i
