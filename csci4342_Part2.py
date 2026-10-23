@@ -197,8 +197,8 @@ def compound_statement(i):
         sys.exit(1)
 
     i = statement(i)
-    i = i+1
-    i = statement(i)
+    if lexemes[i] == ";":
+        #TODO finish 
 
     return i
 
