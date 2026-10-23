@@ -94,7 +94,6 @@ def expression(i):
 
 # <assignment statement>
 def assignment_statement(i):
-    print("assignment statement")
     i = identifier(i)
     if lexeme_tokens[i] == "Assignment Token":
         i = i+1
@@ -188,17 +187,17 @@ def structured_statement(i):
 
 # <statement>
 def statement(i):
-    print("statement")
+    
     if lexeme_tokens[i] == "Identifier Token" or lexemes[i] == "read" or lexemes[i] == "write":
         i = simple_statement(i)
-        print("back in statement")
-        print(lexemes[i])
     elif lexemes[i] == "begin" or lexemes[i] == "if" or lexemes[i] == "while":
         i = structured_statement(i)
-    elif lexemes[i] == "end":
-            return i # <empty statement> next lexeme is end
+    elif lexemes[i] == "end" or lexemes[i] == ";":
+        return i # <empty statement> next lexeme is end
     else:
         print("Error: ", lexemes[i], "is not the start of a valid statement.")
+        print(i)
+        sys.exit(i)
 
     
     return i
@@ -207,12 +206,13 @@ def statement(i):
 def compound_statement(i):
     if lexemes[i] == "begin":
         i = i+1
-        print(i)
+        
     else:
         print("Error: Expected lexene 'begin', got", lexemes[i], "instead")
         sys.exit(1)
 
     i = statement(i)
+    
     if lexemes[i] == ";":
        more_statements = True
     else:
@@ -221,11 +221,15 @@ def compound_statement(i):
     while more_statements:
         i = i+1 # consume ;
         i = statement(i)
-        if lexemes[i] == "end":
+        if lexemes[i] == "end" or lexemes[i] != ";":
             more_statements = False
 
-    i = i + 1 # consume end
-    
+    print(lexemes[i])
+    if lexemes[i] != "end":
+        print("Error: Expected ';' in between statements")
+        sys.exit(1)
+    else:
+        i = i + 1 # consume end
 
     return i
 
