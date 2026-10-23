@@ -126,6 +126,7 @@ def write_statement(i):
         i = i+1 # consume )
     else:
         print("Error: ')' is expected after write statement")
+        sys.exit()
     return i
 
 # <simple statement>
@@ -472,7 +473,8 @@ for lexeme in lexemes:
         print(lexeme, ": Identifier Token")
         lexeme_tokens.append("Identifier Token")
     else:
-        print(lexeme, ": Invalid")
+        print(lexeme, " is an invalid token")
+        sys.exit(1)
 
 #print(lexeme_tokens)
 
