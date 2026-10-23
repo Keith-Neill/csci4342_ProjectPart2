@@ -42,7 +42,7 @@ def factor(i):
     elif lexemes[i] == "not":
         print("not")
         i = i+1 # consume "not"
-        factor(i)
+        i = factor(i)
     elif lexeme_tokens[i] == "Identifier Token":
         i = identifier(i)
     else:
@@ -139,7 +139,7 @@ def simple_statement(i):
     elif lexemes[i] == "read":
         i = read_statement(i)
     elif lexemes[i] == "write":
-            i = write_statement(i)
+        i = write_statement(i)
     else:
         print("Error: ",lexemes[i],"is not recognised as a statement.")
         sys.exit(1)
@@ -191,6 +191,8 @@ def statement(i):
     print("statement")
     if lexeme_tokens[i] == "Identifier Token" or lexemes[i] == "read" or lexemes[i] == "write":
         i = simple_statement(i)
+        print("back in statement")
+        print(lexemes[i])
     elif lexemes[i] == "begin" or lexemes[i] == "if" or lexemes[i] == "while":
         i = structured_statement(i)
     elif lexemes[i] == "end":
@@ -373,7 +375,8 @@ def block(i):
     i = procedure_declaration_part(i)
     i = statement_part(i)
     print("End of block. i = ", i)
-    print(lexemes[i])
+    #print(lexemes[i])
+    return i
 
 # <program>
 def program(i):
@@ -389,8 +392,15 @@ def program(i):
             sys.exit(1)
         print(i)
         
-        block(i)
-        
+        i = block(i)
+
+        if i > len(lexemes) - 1:
+            print("Error: Expect '.' after last 'end'.")
+        elif lexemes[i] != "." or i < len(lexemes) - 1:
+            print("Error: There cannot be anything after the last 'end' in the program.")
+        else:
+            print("Success!")
+
     else:
         print("Error: expected 'program', found'" ,lexemes[i], "'instead")
         sys.exit(1)
