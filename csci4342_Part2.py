@@ -21,26 +21,23 @@ def identifier(i):
 # <factor>
 def factor(i):
 
+    # if "(<expression>)"
     if lexemes[i] == "(":
         i = i+1 # consume (
-        print("consume (")
         i = expression(i)
         if lexemes[i] == ")":
-            print(")")
             i = i+1 # consume )
             return i
         else:
             print("Error: Expected ')' after expression.")
             sys.exit(1)
 
-    print("inside factor")
-    print("lexeme ", lexemes[i+1])
     if lexeme_tokens[i] == "Integer Token" or lexeme_tokens[i] == "Boolean Token":
-        print("in int or bool")
+        
         i = i+1 # <constant>
     
     elif lexemes[i] == "not":
-        print("not")
+        
         i = i+1 # consume "not"
         i = factor(i)
     elif lexeme_tokens[i] == "Identifier Token":
@@ -115,6 +112,8 @@ def read_statement(i):
         i = i+1 # consume )
     else:
         print("Error: ')' is expected after read statement")
+        sys.exit(1)
+    
     return i
 
 # <write statement>
@@ -194,19 +193,17 @@ def statement(i):
     elif lexemes[i] == "begin" or lexemes[i] == "if" or lexemes[i] == "while":
         i = structured_statement(i)
     elif lexemes[i] == "end" or lexemes[i] == ";":
-        return i # <empty statement> next lexeme is end
+        return i # <empty statement>
     else:
         print("Error: ", lexemes[i], "is not the start of a valid statement.")
-        print(i)
         sys.exit(i)
 
-    
     return i
 
 # <compound statement>
 def compound_statement(i):
     if lexemes[i] == "begin":
-        i = i+1
+        i = i+1 # consume "begin"
         
     else:
         print("Error: Expected lexene 'begin', got", lexemes[i], "instead")
@@ -225,9 +222,11 @@ def compound_statement(i):
         if lexemes[i] == "end" or lexemes[i] != ";":
             more_statements = False
 
-    print(lexemes[i])
-    if lexemes[i] != "end":
+    if lexemes[i] != "end" and (lexeme_tokens[i] == "Identifier Token" or lexeme_tokens[i] == "Reserved Token"):
         print("Error: Expected ';' in between statements")
+        sys.exit(1)
+    elif lexemes[i] != "end":
+        print("Expected 'end' after compound statement.")
         sys.exit(1)
     else:
         i = i + 1 # consume end
@@ -248,11 +247,10 @@ def procedure_block(i):
 
 # <procedure declaration>
 def procedure_declaration(i):
-    i = i+1 # consume procedure
+    i = i+1 # consume "procedure"
     i = identifier(i)
     if lexemes[i] == ";":
-        i = i+1
-        print(i)
+        i = i+1 # consume ";"
     else:
         print("Error: Expected a ';', got", lexemes[i], "instead")
         sys.exit(1)
@@ -271,8 +269,7 @@ def procedure_declaration_part(i):
     while more_procedure_declarations:
         i = procedure_declaration(i)
         if lexemes[i] == ";":
-            i = i+1
-            print(i)
+            i = i+1 # consume ";"
         else:
             print("Error: Expected a ';', got", lexemes[i], "instead")
             sys.exit(1)
@@ -284,7 +281,7 @@ def procedure_declaration_part(i):
 # <simple type>
 def simple_type(i):
     if lexeme_tokens[i] == "Data Type Token":
-        i = i+1
+        i = i+1 # consume data type
     else:
         print("Error: Expected a Data Type Token, got a ", lexeme_tokens[i], " instead. Lexeme ", lexemes[i], " is not a Data Type Token.")
         sys.exit(1)
@@ -299,10 +296,8 @@ def type(i):
 def variable_declaration(i):
        
     i = identifier(i)
-    print(i)
 
     if lexemes[i] == "," and lexeme_tokens[i+1] == "Identifier Token":
-        print("loop in while")
         more_identifiers = True
     else:
         more_identifiers = False
@@ -313,40 +308,33 @@ def variable_declaration(i):
             sys.exit(1)
         
         i = i+1 # consume ","
-        print(i)
         i = identifier(i)
-        print(i)
 
         if lexemes[i] != "," and lexeme_tokens[i+1] != "Identifier Token":
             more_identifiers = False
-            print("get out of while")
     
     if lexemes[i] == ":":
         i = i+1 # consume the ":" lexeme
-        print(i)
     else:
         print("Error: Expect a ':', got",lexemes[i], "instead.")
         sys.exit(1)
 
     i = type(i)
-    print(i)
     
     return i
 
 # <variable declaration part>
 def variable_declarition_part(i):
     if lexemes[i] == "var":
-        i = i+1 # consume var
+        i = i+1 # consume "var"
     else:
         # if the current lexeme isn't i, go back to block() function. <variable declaration part> -> empty string
         return i
     
     i = variable_declaration(i)
-    print(i)
 
     if lexemes[i] == ";":
-        i = i+1
-        print(i)
+        i = i+1 # consume ";"
     else:
         print("Error: Expected a ';', got", lexeme[i], "instead")
         sys.exit(1)
@@ -355,21 +343,18 @@ def variable_declarition_part(i):
         more_variable_declaritions = True
     else:
         more_variable_declaritions = False
+    
     while more_variable_declaritions:
-        print("in while loop")
+        
         i = variable_declaration(i)
-        print(i)
         if lexemes[i] == ";":
-            i = i+1
-            print(i)
+            i = i+1 # consume ";"
         else:
             print("Error: Expected a ';', got", lexeme[i], "instead")
             sys.exit(1)
         if lexeme_tokens[i] != "Identifier Token":
             more_variable_declaritions = False
-            print("get out of while loop")
         
-
     return i
     
 
@@ -379,23 +364,19 @@ def block(i):
     i = variable_declarition_part(i)
     i = procedure_declaration_part(i)
     i = statement_part(i)
-    print("End of block. i = ", i)
-    #print(lexemes[i])
     return i
+
 
 # <program>
 def program(i):
     if lexemes[i] == "program":
-        i = i+1 # consumed input "program" increment i
-        print(i)
+        i = i+1 # consumed input "program" increment i by 1
         i = identifier(i)
-        print(i)
         if lexemes[i] == ";":
             i = i+1
         else:
             print("Error: ';' is expected. Fornd'", lexemes[i], "'instead.")
             sys.exit(1)
-        print(i)
         
         i = block(i)
 
@@ -404,7 +385,7 @@ def program(i):
         elif lexemes[i] != "." or i < len(lexemes) - 1:
             print("Error: There cannot be anything after the last 'end' in the program.")
         else:
-            print("Success!")
+            print("Parse successful.")
 
     else:
         print("Error: expected 'program', found'" ,lexemes[i], "'instead")
@@ -443,42 +424,29 @@ lexeme_tokens = []
 # determine what type of token each lexeme is
 for lexeme in lexemes:
     if lexeme in reserved_tokens_list:
-        print(lexeme,": Reserved Token")
         lexeme_tokens.append("Reserved Token")
     elif lexeme in data_type_tokens_list:
-        print(lexeme, ": Data Type Token")
         lexeme_tokens.append("Data Type Token")
     elif lexeme in boolean_tokens_list:
-        print(lexeme, ": Boolean Token")
         lexeme_tokens.append("Boolean Token")
     elif lexeme in special_tokens_list:
-        print(lexeme, ": Special Token")
         lexeme_tokens.append("Special Token")
     elif lexeme == ":=":
-        print(lexeme, ": Assignment Token")
         lexeme_tokens.append("Assignment Token")
     elif lexeme in relation_tokens_list:
-        print(lexeme, ": Relation Token")
         lexeme_tokens.append("Relation Token")
     elif lexeme in addition_tokens_list:
-        print(lexeme, ": Addition Token")
         lexeme_tokens.append("Addition Token")
     elif lexeme in multiplication_tokens_list:
-        print(lexeme, ": Multiplication Token")
         lexeme_tokens.append("Multiplication Token")
     elif integer_type_token.fullmatch(lexeme):
-        print(lexeme, ": Integer Token")
         lexeme_tokens.append("Integer Token")
     elif identifier_token.fullmatch(lexeme):
-        print(lexeme, ": Identifier Token")
         lexeme_tokens.append("Identifier Token")
     else:
-        print(lexeme, " is an invalid token")
+        print(lexeme, "is not associated with a valid token.")
         sys.exit(1)
 
-#print(lexeme_tokens)
-
 # time to put the input through the grammar using the tokens and the lexemes list
-i = 0
-print(i)
+i = 0 # start at position 0 in the lists
 program(i)
